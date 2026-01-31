@@ -10,13 +10,13 @@ pub mod helpers{
     pub mod http_client;
 }
 pub mod models {
-    pub mod team_model;
+    pub mod official_fpl_sync_model;
 }
 pub mod routes {
     pub mod sync_routes;
 }
 pub mod controllers {
-    pub mod team_controllers;
+    pub mod offcial_fpl_controllers;
 }
 
 #[actix_web::main]

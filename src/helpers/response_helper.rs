@@ -9,13 +9,15 @@ pub fn success<T> (
           data: Some(data) }
 }
 
-pub fn failure<T>(
-    message: &str, 
-    code: u16 ,
-    data: Option<T>
-)-> ApiResponse<T>{
-    ApiResponse { success: false,
-         status_code: code,
-          message: message.to_string(),
-           data: data }
+pub fn failure(
+    message: &str,
+    code: u16,
+) -> ApiResponse<()> {
+    ApiResponse {
+        success: false,
+        status_code: code,
+        message: message.to_string(),
+        data: None,
+    }
 }
+

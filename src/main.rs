@@ -3,6 +3,7 @@ use dotenvy::dotenv;
 pub mod datamodels{
     pub mod official_fpl_models;
     pub mod api_response;
+    pub mod auth_models;
 }
 pub mod helpers{
     pub mod db;
@@ -11,12 +12,14 @@ pub mod helpers{
 }
 pub mod models {
     pub mod official_fpl_sync_model;
+    pub mod auth_model;
 }
 pub mod routes {
     pub mod sync_routes;
 }
 pub mod controllers {
     pub mod offcial_fpl_controllers;
+    pub mod auth_controller;
 }
 
 #[actix_web::main]

@@ -5,17 +5,21 @@ pub mod datamodels{
     pub mod api_response;
     pub mod auth_models;
     pub mod fantasy_team_data_models;
+    pub mod fantasy_league_data_model;
+    
 }
 pub mod helpers{
     pub mod db;
     pub mod response_helper;
     pub mod http_client;
     pub mod auth_middleware;
+pub mod fantasy_league_helper;
 }
 pub mod models {
     pub mod official_fpl_sync_model;
     pub mod auth_model;
     pub mod fantasy_team_model;
+    pub mod fantasy_league_model;
 }
 pub mod routes {
     pub mod sync_routes;
@@ -24,6 +28,7 @@ pub mod controllers {
     pub mod offcial_fpl_controllers;
     pub mod auth_controller;
     pub mod fantasy_team_controllers;
+    pub mod fantasy_league_controller;
 }
 
 #[actix_web::main]

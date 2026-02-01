@@ -1,4 +1,4 @@
-use crate::controllers::{auth_controller, fantasy_team_controllers, offcial_fpl_controllers};
+use crate::controllers::{auth_controller, fantasy_league_controller, fantasy_team_controllers, offcial_fpl_controllers};
 use actix_web::{post, web};
 
 pub fn init(cfg: &mut web::ServiceConfig) {
@@ -14,24 +14,27 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             ),
     );
 
-      cfg.service(
+    cfg.service(
         web::scope("/auth")
-            .route(
-                "/nonce",
-                web::post().to(auth_controller::get_nonce),
-            )
-            .route(
-                "/verify",
-                web::post().to(auth_controller::verify_wallet),
-            ),
+            .route("/nonce", web::post().to(auth_controller::get_nonce))
+            .route("/verify", web::post().to(auth_controller::verify_wallet)),
     );
 
-       cfg.service(
+    cfg.service(
         web::scope("/fantasy")
             .route(
                 "/create-team",
-                web::post()
-                    .to(fantasy_team_controllers::create_team),
+                web::post().to(fantasy_team_controllers::create_team),
             )
+            .route(
+                "/my-team",
+                web::get().to(fantasy_team_controllers::get_my_team),
+            )
+             .route(
+                "/create-league",
+                web::post().to(fantasy_league_controller::create_league),
+            )
+            
+            
     );
 }

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug,Deserialize,Serialize)]
 pub struct FplTeam {
@@ -16,34 +17,35 @@ pub struct FplBootstrapResponse {
 
 
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct FPLPlayer {
     pub id: i32,
 
-    pub first_name: String,
-    pub second_name: String,
-    pub photo: String,
+    pub first_name: Option<String>,
+    pub second_name: Option<String>,
+    pub photo: Option<String>,
 
-    pub team: i32,
+    pub team: Option<i32>,
 
-    // API sends this as "0.0" (string)
-    pub form: String,
-#[serde(default)]
-    pub points: i32,
-    pub total_points: i32,
-    pub minutes: i32,
+    pub form: Option<String>,
 
-    pub goals_scored: i32,
-    pub assists: i32,
-    pub yellow_cards: i32,
-    pub red_cards: i32,
-    pub saves: i32,
-    pub starts: i32,
+    #[serde(default)]
+    pub points: Option<i32>,
 
-    // Can be null
+    pub total_points: Option<i32>,
+    pub minutes: Option<i32>,
+
+    pub goals_scored: Option<i32>,
+    pub assists: Option<i32>,
+    pub yellow_cards: Option<i32>,
+    pub red_cards: Option<i32>,
+    pub saves: Option<i32>,
+    pub starts: Option<i32>,
+
     pub news: Option<String>,
-   #[serde(rename = "element_type")]
-    pub position: i32
+
+    #[serde(rename = "element_type")]
+    pub position: Option<i32>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -52,10 +54,3 @@ pub struct FplBootstrapResponsePlayers {
 }
 
 
-#[derive(Debug, Serialize)]
-pub struct MyTeamResponse {
-    pub team_id: Uuid,
-    pub captain: FPLPlayer,
-    pub vice_captain: FPLPlayer,
-    pub players: Vec<FPLPlayer>,
-}

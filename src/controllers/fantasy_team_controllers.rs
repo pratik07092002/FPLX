@@ -17,7 +17,7 @@ pub async fn create_team(
     req: web::Json<CreateTeamRequest>,
 ) -> HttpResponse {
     let user_id = user.user_id;
-    
+
 
     match process(pool.get_ref(), user_id, req.0).await {
 
@@ -105,4 +105,41 @@ async fn process(
 
     Ok(())
 }
+
+
+pub async fn get_my_team(
+    pool: web::Data<PgPool>,
+    user: AuthUser,
+) -> HttpResponse {
+
+    match fantasy_team_model::get_my_team(
+        pool.get_ref(),
+        user.user_id,
+    )
+    .await
+    {
+        Ok(team) => {
+
+            let res = response_helper::success(
+                "Team fetched",
+                team,
+            );
+
+            HttpResponse::Ok().json(res)
+        }
+
+        Err(e) => {
+
+            eprintln!("Get team error: {:?}", e);
+
+            let res = response_helper::failure(
+                &e.to_string(),
+                404,
+            );
+
+            HttpResponse::NotFound().json(res)
+        }
+    }
+}
+
 

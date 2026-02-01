@@ -1,4 +1,4 @@
-use crate::controllers::{auth_controller, offcial_fpl_controllers};
+use crate::controllers::{auth_controller, fantasy_team_controllers, offcial_fpl_controllers};
 use actix_web::{post, web};
 
 pub fn init(cfg: &mut web::ServiceConfig) {
@@ -24,5 +24,14 @@ pub fn init(cfg: &mut web::ServiceConfig) {
                 "/verify",
                 web::post().to(auth_controller::verify_wallet),
             ),
+    );
+
+       cfg.service(
+        web::scope("/fantasy")
+            .route(
+                "/create-team",
+                web::post()
+                    .to(fantasy_team_controllers::create_team),
+            )
     );
 }

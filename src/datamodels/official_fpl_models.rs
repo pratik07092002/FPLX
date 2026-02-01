@@ -50,3 +50,12 @@ pub struct FPLPlayer {
 pub struct FplBootstrapResponsePlayers {
     pub elements: Vec<FPLPlayer>,
 }
+
+
+#[derive(Debug, Serialize)]
+pub struct MyTeamResponse {
+    pub team_id: Uuid,
+    pub captain: FPLPlayer,
+    pub vice_captain: FPLPlayer,
+    pub players: Vec<FPLPlayer>,
+}

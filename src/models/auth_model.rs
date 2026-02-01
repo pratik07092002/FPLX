@@ -1,6 +1,8 @@
 use sqlx::PgPool;
 use anyhow::Result;
 
+use crate::datamodels::auth_models::UserAuth;
+
 pub async fn insert_nonce(
     pool: &PgPool,
     nonce: &str,
@@ -65,4 +67,23 @@ pub async fn mark_logged_in(
     Ok(())
 }
 
+pub async fn get_user_by_wallet(
+    pool: &PgPool,
+    wallet: &str,
+) -> Result<UserAuth, sqlx::Error> {
 
+    let rec = sqlx::query!(
+        r#"
+        SELECT id
+        FROM users
+        WHERE wallet_address = $1
+        "#,
+        wallet
+    )
+    .fetch_one(pool)
+    .await?;
+
+    Ok(UserAuth {
+        id: rec.id,
+    })
+}

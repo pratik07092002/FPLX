@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 pub struct NonceRequest {
@@ -22,8 +23,20 @@ pub struct AuthResponse {
 }
 
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct JwtClaims {
     pub sub: String,
     pub exp: usize,
+}
+
+
+#[derive(Debug)]
+pub struct AuthUser {
+    pub user_id: Uuid,
+    pub wallet: String,
+}
+
+
+pub struct UserAuth {
+    pub id: Uuid,
 }

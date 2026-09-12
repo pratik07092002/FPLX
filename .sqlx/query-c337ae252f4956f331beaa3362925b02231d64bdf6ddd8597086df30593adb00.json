@@ -1,0 +1,86 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            p.id,\n            p.first_name,\n            p.second_name,\n            p.photo,\n            p.team_id,\n            t.name AS team_name,\n            t.short_name AS team_short_name,\n            p.position,\n            p.now_cost,\n            p.form,\n            p.total_points,\n            p.news\n        FROM players p\n        JOIN teams t ON t.id = p.team_id\n        ORDER BY p.position, p.now_cost DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "second_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "photo",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "team_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "team_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "team_short_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "now_cost",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "form",
+        "type_info": "Float4"
+      },
+      {
+        "ordinal": 10,
+        "name": "total_points",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "news",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "c337ae252f4956f331beaa3362925b02231d64bdf6ddd8597086df30593adb00"
+}

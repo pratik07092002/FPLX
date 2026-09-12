@@ -1,7 +1,10 @@
-use crate::controllers::{auth_controller, fantasy_league_controller, fantasy_team_controllers, live_sync_controller, offcial_fpl_controllers, points_controller, transfers_controller};
+use crate::controllers::{auth_controller, catalog_controller, fantasy_league_controller, fantasy_team_controllers, live_sync_controller, offcial_fpl_controllers, points_controller, transfers_controller};
 use actix_web::{post, web};
 
 pub fn init(cfg: &mut web::ServiceConfig) {
+    cfg.route("/teams", web::get().to(catalog_controller::list_teams));
+    cfg.route("/players", web::get().to(catalog_controller::list_players));
+
     cfg.service(
         web::scope("/sync")
             .route(

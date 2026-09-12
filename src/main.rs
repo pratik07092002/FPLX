@@ -1,9 +1,12 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer};
 use dotenvy::dotenv;
+use std::env;
 pub mod datamodels{
     pub mod official_fpl_models;
     pub mod api_response;
     pub mod auth_models;
+    pub mod catalog_data_model;
     pub mod fantasy_team_data_models;
     pub mod fantasy_league_data_model;
     pub mod points_data_model;
@@ -24,6 +27,7 @@ pub mod helpers{
 pub mod models {
     pub mod official_fpl_sync_model;
     pub mod auth_model;
+    pub mod catalog_model;
     pub mod fantasy_team_model;
     pub mod fantasy_league_model;
     pub mod live_sync_model;
@@ -36,6 +40,7 @@ pub mod routes {
 pub mod controllers {
     pub mod offcial_fpl_controllers;
     pub mod auth_controller;
+    pub mod catalog_controller;
     pub mod fantasy_team_controllers;
     pub mod fantasy_league_controller;
     pub mod live_sync_controller;
@@ -100,18 +105,37 @@ async fn main() -> anyhow::Result<()> {
 
     tokio::spawn(run_live_sync_loop(pool.clone()));
 
+    let port: u16 = env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8080);
+
+    let cors_origins: Vec<String> = env::var("CORS_ORIGINS")
+        .unwrap_or_else(|_| "http://localhost:3000".to_string())
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .collect();
+
     HttpServer::new(move || {
+
+        let cors = cors_origins
+            .iter()
+            .fold(Cors::default(), |cors, origin| cors.allowed_origin(origin))
+            .allow_any_method()
+            .allow_any_header()
+            .supports_credentials();
 
         App::new()
             .app_data(
                 actix_web::web::Data::new(pool.clone())
             )
+            .wrap(cors)
             .route("/health", web::get().to(health))
             .configure(
                 routes::sync_routes::init
             )
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await?;
 

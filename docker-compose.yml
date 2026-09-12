@@ -24,8 +24,19 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       DEV_MODE: ${DEV_MODE:-false}
       DEV_USER_WALLET: ${DEV_USER_WALLET:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     ports:
       - "8080:8080"
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    depends_on:
+      - app
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    ports:
+      - "3000:3000"
     restart: unless-stopped
 
 volumes:

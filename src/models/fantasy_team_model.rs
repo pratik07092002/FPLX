@@ -42,20 +42,23 @@ pub async fn create_team(
     captain_id: i32,
 
     vice_captain_id: i32,
+
+    current_gameweek: i32,
 ) -> Result<Uuid> {
 
     let rec = sqlx::query!(
         r#"
         INSERT INTO fantasy_teams
-        (user_id, captain_id, vice_captain_id)
+        (user_id, captain_id, vice_captain_id, last_transfer_gameweek)
 
-        VALUES ($1,$2,$3)
+        VALUES ($1,$2,$3,$4)
 
         RETURNING id
         "#,
         user_id,
         captain_id,
-        vice_captain_id
+        vice_captain_id,
+        current_gameweek,
     )
     .fetch_one(&mut **tx)
     .await?;

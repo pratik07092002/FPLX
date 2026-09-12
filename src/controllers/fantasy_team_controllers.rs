@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::{
     datamodels::{auth_models::AuthUser, fantasy_team_data_models::CreateTeamRequest},
-    helpers::{response_helper, squad_rules},
+    helpers::{fpl_meta, response_helper, squad_rules},
     models::fantasy_team_model,
 };
 
@@ -72,6 +72,8 @@ async fn process(
         req.vice_captain_id,
     )?;
 
+    let current_gameweek = fpl_meta::current_gameweek().await?;
+
     // ---------- TRANSACTION ----------
 
     let mut tx = pool.begin().await?;
@@ -83,6 +85,7 @@ async fn process(
             user_id,
             req.captain_id,
             req.vice_captain_id,
+            current_gameweek,
         )
         .await?;
 

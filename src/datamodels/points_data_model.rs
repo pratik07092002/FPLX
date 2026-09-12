@@ -17,6 +17,8 @@ pub struct PlayerPoints {
 pub struct TeamPoints {
     pub team_id: Uuid,
     pub gameweek: i32,
+    pub gross_points: i32,
+    pub points_hit: i32,
     pub total_points: i32,
     pub players: Vec<PlayerPoints>,
 }

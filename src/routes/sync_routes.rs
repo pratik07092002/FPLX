@@ -1,4 +1,4 @@
-use crate::controllers::{auth_controller, fantasy_league_controller, fantasy_team_controllers, live_sync_controller, offcial_fpl_controllers, points_controller};
+use crate::controllers::{auth_controller, fantasy_league_controller, fantasy_team_controllers, live_sync_controller, offcial_fpl_controllers, points_controller, transfers_controller};
 use actix_web::{post, web};
 
 pub fn init(cfg: &mut web::ServiceConfig) {
@@ -45,6 +45,10 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .route(
                 "/leagues/{league_id}/leaderboard",
                 web::get().to(points_controller::league_leaderboard),
+            )
+            .route(
+                "/transfers",
+                web::post().to(transfers_controller::make_transfers),
             )
     );
 }

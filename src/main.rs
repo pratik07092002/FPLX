@@ -7,6 +7,7 @@ pub mod datamodels{
     pub mod fantasy_team_data_models;
     pub mod fantasy_league_data_model;
     pub mod points_data_model;
+    pub mod transfers_data_model;
 
 }
 pub mod helpers{
@@ -26,6 +27,7 @@ pub mod models {
     pub mod fantasy_league_model;
     pub mod live_sync_model;
     pub mod points_engine_model;
+    pub mod transfers_model;
 }
 pub mod routes {
     pub mod sync_routes;
@@ -37,6 +39,7 @@ pub mod controllers {
     pub mod fantasy_league_controller;
     pub mod live_sync_controller;
     pub mod points_controller;
+    pub mod transfers_controller;
 }
 
 const LIVE_POLL_SECS: u64 = 60;

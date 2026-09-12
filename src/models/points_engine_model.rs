@@ -169,10 +169,14 @@ pub async fn get_team_points(pool: &PgPool, user_id: Uuid, gameweek: i32) -> Res
         total += out.iter().find(|p| p.is_vice_captain).map(|p| p.points).unwrap_or(0);
     }
 
+    let points_hit = crate::models::transfers_model::get_points_hit(pool, team.id, gameweek).await?;
+
     Ok(TeamPoints {
         team_id: team.id,
         gameweek,
-        total_points: total,
+        gross_points: total,
+        points_hit,
+        total_points: total - points_hit,
         players: out,
     })
 }

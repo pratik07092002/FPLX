@@ -19,7 +19,7 @@ use std::pin::Pin;
 
 use crate::datamodels::auth_models::{AuthUser, JwtClaims};
 use crate::models::auth_model;
-use crate::helpers::response_helper;
+use crate::helpers::{jwt, response_helper};
 
 
 fn unauthorized(msg: String) -> Error {
@@ -115,7 +115,7 @@ let wallet = env::var("DEV_USER_WALLET")
 
             let decoded = match decode::<JwtClaims>(
                 token,
-                &DecodingKey::from_secret(b"SUPER_SECRET_KEY"),
+                &DecodingKey::from_secret(&jwt::secret()),
                 &Validation::default(),
             ) {
                 Ok(d) => d,

@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, captain_id, vice_captain_id, free_transfers, last_transfer_gameweek\n        FROM fantasy_teams\n        WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "captain_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "vice_captain_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "free_transfers",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "last_transfer_gameweek",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "f5020a3c12ae9ff3f73077bc0509b4900e336d7b7b55f14d83851717e516e8e2"
+}

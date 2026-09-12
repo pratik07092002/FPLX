@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE fantasy_teams\n        SET free_transfers = $1, last_transfer_gameweek = $2\n        WHERE id = $3\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "68f1f564c2c7716bfdb1d7913385e29b797abdfcc296cae2090a8f148eea547c"
+}

@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO players (\n                id,\n                first_name,\n                second_name,\n                photo,\n                team_id,\n\n                form,\n                points,\n                total_points,\n                minutes_played,\n\n                goals_scored,\n                assists,\n                yellow_cards,\n                red_cards,\n                saves,\n                starts,\n\n                news,\n                position,\n                now_cost\n            )\n            VALUES (\n                $1,$2,$3,$4,$5,\n                $6,$7,$8,$9,\n                $10,$11,$12,$13,$14,$15,\n                $16,$17,$18\n            )\n\n            ON CONFLICT (id)\n            DO UPDATE SET\n\n                first_name = EXCLUDED.first_name,\n                second_name = EXCLUDED.second_name,\n                photo = EXCLUDED.photo,\n                team_id = EXCLUDED.team_id,\n\n                form = EXCLUDED.form,\n                points = EXCLUDED.points,\n                total_points = EXCLUDED.total_points,\n                minutes_played = EXCLUDED.minutes_played,\n\n                goals_scored = EXCLUDED.goals_scored,\n                assists = EXCLUDED.assists,\n                yellow_cards = EXCLUDED.yellow_cards,\n                red_cards = EXCLUDED.red_cards,\n                saves = EXCLUDED.saves,\n                starts = EXCLUDED.starts,\n\n                news = EXCLUDED.news,\n                position = EXCLUDED.position,\n                now_cost = EXCLUDED.now_cost\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text",
+        "Text",
+        "Text",
+        "Int4",
+        "Float4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Text",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f9def5919cef212cdf78c6011cc286f0c7b4b477ac7a8d366b4c30632f897a6e"
+}

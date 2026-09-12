@@ -1,0 +1,112 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            pms.id,\n            p.position,\n            pms.team_side,\n            pms.minutes,\n            pms.goals,\n            pms.assists,\n            pms.own_goals,\n            pms.penalties_saved,\n            pms.penalties_missed,\n            pms.yellow_cards,\n            pms.red_cards,\n            pms.saves,\n            pms.bonus,\n            pms.defensive_contribution,\n            f.home_score,\n            f.away_score\n        FROM player_match_stats pms\n        JOIN players p ON p.id = pms.player_id\n        JOIN fixtures f ON f.id = pms.fixture_id\n        WHERE f.gameweek = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "team_side",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "minutes",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "goals",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "assists",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "own_goals",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 7,
+        "name": "penalties_saved",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "penalties_missed",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "yellow_cards",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 10,
+        "name": "red_cards",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 11,
+        "name": "saves",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 12,
+        "name": "bonus",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "defensive_contribution",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 14,
+        "name": "home_score",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 15,
+        "name": "away_score",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "040528c0e37ce4ba4e9b08befe1146bf88b25c7c5a8202dd90fc94be21aa6194"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO fantasy_team_players\n            (fantasy_team_id, player_id, is_starting, bench_order)\n\n            VALUES ($1,$2,$3,$4)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Bool",
+        "Int2"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bc2e21f96943d804975bade4a627ce33d41a226c160d01b6f8591bb561f6c516"
+}

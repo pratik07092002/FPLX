@@ -1,0 +1,5 @@
+target
+fplx_app
+.git
+.env
+*.log

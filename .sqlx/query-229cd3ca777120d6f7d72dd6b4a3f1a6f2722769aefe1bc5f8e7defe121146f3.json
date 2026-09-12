@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO users (wallet_address, nonce)\n        VALUES ($1,$2)\n        ON CONFLICT (wallet_address)\n        DO UPDATE SET nonce = $2\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "229cd3ca777120d6f7d72dd6b4a3f1a6f2722769aefe1bc5f8e7defe121146f3"
+}

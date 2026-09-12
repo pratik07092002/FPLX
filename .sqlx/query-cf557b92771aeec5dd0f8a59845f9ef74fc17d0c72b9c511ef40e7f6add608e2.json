@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO fixtures (\n                id, gameweek, start_time,\n                home_team_id, away_team_id,\n                started, finished,\n                home_score, away_score\n            )\n            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)\n\n            ON CONFLICT (id)\n            DO UPDATE SET\n                start_time = EXCLUDED.start_time,\n                started = EXCLUDED.started,\n                finished = EXCLUDED.finished,\n                home_score = EXCLUDED.home_score,\n                away_score = EXCLUDED.away_score\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Timestamp",
+        "Int4",
+        "Int4",
+        "Bool",
+        "Bool",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cf557b92771aeec5dd0f8a59845f9ef74fc17d0c72b9c511ef40e7f6add608e2"
+}

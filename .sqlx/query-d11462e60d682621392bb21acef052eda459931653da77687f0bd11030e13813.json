@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM fantasy_team_players WHERE fantasy_team_id = $1 AND player_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d11462e60d682621392bb21acef052eda459931653da77687f0bd11030e13813"
+}

@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO fantasy_transfers\n            (fantasy_team_id, gameweek, player_out_id, player_in_id, points_cost)\n            VALUES ($1,$2,$3,$4,$5)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bc1a7d85c7251a39063881cefa940c41f81d955e67f06e6af89e7442dfa67150"
+}

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COALESCE(SUM(pms.minutes), 0) AS \"minutes!\"\n        FROM player_match_stats pms\n        JOIN fixtures f ON f.id = pms.fixture_id\n        WHERE f.gameweek = $1 AND pms.player_id = $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "minutes!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "e423a04a139fe411e09d11f63a64f3b960e3e4a64cfdedadebd68fc954a7d08b"
+}

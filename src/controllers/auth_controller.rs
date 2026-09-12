@@ -9,7 +9,7 @@ use crate::{
     datamodels::auth_models::{
         AuthResponse, JwtClaims, NonceRequest, NonceResponse, VerifyRequest,
     },
-    helpers::response_helper,
+    helpers::{jwt, response_helper},
     models::auth_model,
 };
 
@@ -131,7 +131,7 @@ auth_model::mark_logged_in(
     let token = match encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret(b"SUPER_SECRET_KEY"),
+        &EncodingKey::from_secret(&jwt::secret()),
     ) {
         Ok(t) => t,
         Err(e) => {

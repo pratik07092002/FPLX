@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE users\n        SET\n            last_login = now(),\n            nonce = NULL\n        WHERE wallet_address = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dad420a15bb8253660ee3475a46a7b832d5a4584991ace5337eaefced16f69ae"
+}

@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT p.id, p.position, p.team_id, p.now_cost, fp.is_starting, fp.bench_order\n        FROM fantasy_team_players fp\n        JOIN players p ON p.id = fp.player_id\n        WHERE fp.fantasy_team_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "team_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "now_cost",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "is_starting",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "bench_order",
+        "type_info": "Int2"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "16db8355efeedba008acc34670a8f378d6c34c2696f99a17c31ce0d44a7d1793"
+}

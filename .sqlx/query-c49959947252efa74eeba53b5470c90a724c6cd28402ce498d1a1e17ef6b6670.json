@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE players p\n        SET points = sub.total\n        FROM (\n            SELECT pms.player_id, SUM(pms.points) AS total\n            FROM player_match_stats pms\n            JOIN fixtures f ON f.id = pms.fixture_id\n            WHERE f.gameweek = $1\n            GROUP BY pms.player_id\n        ) sub\n        WHERE p.id = sub.player_id\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c49959947252efa74eeba53b5470c90a724c6cd28402ce498d1a1e17ef6b6670"
+}

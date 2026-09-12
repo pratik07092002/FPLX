@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, captain_id, vice_captain_id\n        FROM fantasy_teams\n        WHERE user_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "captain_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "vice_captain_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "06cceaae779bcb30babc2c4c458482d38f0051e650f3978873c0eadd64126642"
+}

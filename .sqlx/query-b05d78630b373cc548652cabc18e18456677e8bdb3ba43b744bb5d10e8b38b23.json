@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT player_id, points, minutes\n        FROM player_match_stats\n        WHERE fixture_id = $1 AND player_id = ANY($2)\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "player_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "points",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "minutes",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "b05d78630b373cc548652cabc18e18456677e8bdb3ba43b744bb5d10e8b38b23"
+}

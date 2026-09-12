@@ -1,4 +1,4 @@
-use actix_web::{App, HttpServer};
+use actix_web::{web, App, HttpResponse, HttpServer};
 use dotenvy::dotenv;
 pub mod datamodels{
     pub mod official_fpl_models;
@@ -17,6 +17,7 @@ pub mod helpers{
     pub mod auth_middleware;
     pub mod fantasy_league_helper;
     pub mod fpl_meta;
+    pub mod jwt;
     pub mod scoring_rules;
     pub mod squad_rules;
 }
@@ -69,6 +70,16 @@ async fn run_live_sync_loop(pool: sqlx::PgPool) {
     }
 }
 
+async fn health(pool: web::Data<sqlx::PgPool>) -> HttpResponse {
+    match sqlx::query!("SELECT 1 AS ok").fetch_one(pool.get_ref()).await {
+        Ok(_) => HttpResponse::Ok().json(serde_json::json!({ "status": "ok" })),
+        Err(e) => {
+            eprintln!("Health check DB ping failed: {:?}", e);
+            HttpResponse::ServiceUnavailable().json(serde_json::json!({ "status": "db_unreachable" }))
+        }
+    }
+}
+
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
 
@@ -79,6 +90,14 @@ async fn main() -> anyhow::Result<()> {
 
     println!("DB connected");
 
+    // ignore_missing: a backfill migration was added with an earlier
+    // timestamp than migrations already applied on existing databases.
+    sqlx::migrate!("./migrations")
+        .set_ignore_missing(true)
+        .run(&pool)
+        .await?;
+    println!("Migrations up to date");
+
     tokio::spawn(run_live_sync_loop(pool.clone()));
 
     HttpServer::new(move || {
@@ -87,6 +106,7 @@ async fn main() -> anyhow::Result<()> {
             .app_data(
                 actix_web::web::Data::new(pool.clone())
             )
+            .route("/health", web::get().to(health))
             .configure(
                 routes::sync_routes::init
             )

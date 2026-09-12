@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO player_match_stats (\n                fixture_id, player_id, team_side,\n                minutes, goals, assists, own_goals,\n                penalties_saved, penalties_missed,\n                yellow_cards, red_cards, saves,\n                bonus, bps, defensive_contribution\n            )\n            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)\n\n            ON CONFLICT (fixture_id, player_id)\n            DO UPDATE SET\n                team_side = EXCLUDED.team_side,\n                minutes = EXCLUDED.minutes,\n                goals = EXCLUDED.goals,\n                assists = EXCLUDED.assists,\n                own_goals = EXCLUDED.own_goals,\n                penalties_saved = EXCLUDED.penalties_saved,\n                penalties_missed = EXCLUDED.penalties_missed,\n                yellow_cards = EXCLUDED.yellow_cards,\n                red_cards = EXCLUDED.red_cards,\n                saves = EXCLUDED.saves,\n                bonus = EXCLUDED.bonus,\n                bps = EXCLUDED.bps,\n                defensive_contribution = EXCLUDED.defensive_contribution\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4",
+        "Bpchar",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ca671154b02e2a524029b0fdbe83c3a9888b2a7ef3c2518c2c0db178d36f43f2"
+}

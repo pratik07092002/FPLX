@@ -30,11 +30,16 @@ services:
     restart: unless-stopped
 
   web:
-    build: ./web
+    build:
+      context: ./web
+      # Next.js inlines NEXT_PUBLIC_* into the client bundle at build time,
+      # so this has to be a build arg, not a runtime environment var — it
+      # must point wherever the browser can reach the API from (not the
+      # in-network "app" hostname).
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     depends_on:
       - app
-    environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     ports:
       - "3000:3000"
     restart: unless-stopped

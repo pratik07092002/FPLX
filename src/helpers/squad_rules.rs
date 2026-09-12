@@ -114,6 +114,82 @@ pub fn validate_squad(
     Ok(())
 }
 
+// ---------- Derby (single fixture, no bench) ----------
+
+pub const DERBY_SQUAD_SIZE: usize = 11;
+pub const DERBY_MAX_PER_CLUB: usize = 7;
+
+/// A Derby squad is just a starting XI drawn from the two clubs in one
+/// fixture — same shape rules as a Campaign starting XI, but the "max per
+/// club" cap is relaxed (only 2 clubs to draw from) and every player must
+/// belong to one of them.
+pub fn validate_derby_squad(
+    players: &[SquadPlayerInfo],
+    home_team_id: i32,
+    away_team_id: i32,
+    captain_id: i32,
+    vice_captain_id: i32,
+) -> Result<()> {
+    if players.len() != DERBY_SQUAD_SIZE {
+        bail!("Derby squad must have exactly {} players", DERBY_SQUAD_SIZE);
+    }
+
+    let all_ids: HashSet<i32> = players.iter().map(|p| p.id).collect();
+    if all_ids.len() != players.len() {
+        bail!("Squad contains duplicate players");
+    }
+
+    let total_cost: i32 = players.iter().map(|p| p.now_cost).sum();
+    if total_cost > BUDGET_LIMIT {
+        bail!(
+            "Squad costs {:.1}m, budget is {:.1}m",
+            total_cost as f32 / 10.0,
+            BUDGET_LIMIT as f32 / 10.0
+        );
+    }
+
+    for p in players {
+        if p.team_id != home_team_id && p.team_id != away_team_id {
+            bail!("Player {} is not part of this fixture", p.id);
+        }
+    }
+
+    let mut by_position: HashMap<i32, usize> = HashMap::new();
+    let mut by_club: HashMap<i32, usize> = HashMap::new();
+    for p in players {
+        *by_position.entry(p.position).or_insert(0) += 1;
+        *by_club.entry(p.team_id).or_insert(0) += 1;
+    }
+
+    let gk_count = by_position.get(&GK).copied().unwrap_or(0);
+    if gk_count != STARTING_GK {
+        bail!("Squad must include exactly 1 goalkeeper");
+    }
+    check_range(&by_position, DEF, STARTING_DEF_RANGE, "defenders")?;
+    check_range(&by_position, MID, STARTING_MID_RANGE, "midfielders")?;
+    check_range(&by_position, FWD, STARTING_FWD_RANGE, "forwards")?;
+
+    if let Some((_, &count)) = by_club.iter().find(|&(_, &c)| c > DERBY_MAX_PER_CLUB) {
+        bail!(
+            "Max {} players allowed from one side (found {})",
+            DERBY_MAX_PER_CLUB,
+            count
+        );
+    }
+
+    if captain_id == vice_captain_id {
+        bail!("Captain and vice-captain must be different players");
+    }
+    if !all_ids.contains(&captain_id) {
+        bail!("Captain must be part of the squad");
+    }
+    if !all_ids.contains(&vice_captain_id) {
+        bail!("Vice-captain must be part of the squad");
+    }
+
+    Ok(())
+}
+
 fn check_count(
     by_position: &HashMap<i32, usize>,
     position: i32,

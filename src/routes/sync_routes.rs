@@ -39,6 +39,10 @@ pub fn init(cfg: &mut web::ServiceConfig) {
                 web::post().to(fantasy_league_controller::create_league),
             )
             .route(
+                "/leagues/{league_id}/join",
+                web::post().to(fantasy_league_controller::join_league),
+            )
+            .route(
                 "/my-points",
                 web::get().to(points_controller::my_points),
             )

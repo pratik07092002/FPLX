@@ -1,9 +1,13 @@
 use anyhow::Result;
+use sqlx::types::Json;
 use sqlx::PgPool;
+use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::datamodels::fantasy_league_data_model::ContestEntry;
 use crate::datamodels::points_data_model::{LeaderboardEntry, PlayerPoints, TeamPoints};
 use crate::helpers::scoring_rules::{self, FixtureStatLine};
+use crate::models::fantasy_league_model;
 
 /// Recomputes fantasy points for every stat line recorded in a gameweek, and
 /// refreshes each affected player's current-gameweek point total. Safe to call
@@ -181,31 +185,141 @@ pub async fn get_team_points(pool: &PgPool, user_id: Uuid, gameweek: i32) -> Res
     })
 }
 
-pub async fn get_league_leaderboard(
-    pool: &PgPool,
-    league_id: i32,
-    gameweek: i32,
-) -> Result<Vec<LeaderboardEntry>> {
-    let participants = sqlx::query!(
-        "SELECT user_id, user_name FROM fantasy_league_participants WHERE league_id = $1",
-        league_id
+/// Points for a one-shot Round entry — scored from the specific gameweek
+/// the league is pinned to, never from the mutable `players.points` cache
+/// (which only ever holds whatever gameweek was last recalculated).
+pub async fn get_round_entry_points(pool: &PgPool, entry: &ContestEntry, gameweek: i32) -> Result<i32> {
+    let rows = sqlx::query!(
+        r#"
+        SELECT pms.player_id, COALESCE(SUM(pms.points), 0)::INTEGER AS "points!"
+        FROM player_match_stats pms
+        JOIN fixtures f ON f.id = pms.fixture_id
+        WHERE f.gameweek = $1 AND pms.player_id = ANY($2)
+        GROUP BY pms.player_id
+        "#,
+        gameweek,
+        &entry.starting_ids,
     )
     .fetch_all(pool)
     .await?;
 
-    let mut entries = Vec::with_capacity(participants.len());
+    let points_by: HashMap<i32, i32> = rows.into_iter().map(|r| (r.player_id, r.points)).collect();
 
-    for p in participants {
-        let total_points = get_team_points(pool, p.user_id, gameweek)
-            .await
-            .map(|tp| tp.total_points)
-            .unwrap_or(0); // no squad created yet
+    let mut total: i32 = entry
+        .starting_ids
+        .iter()
+        .map(|id| points_by.get(id).copied().unwrap_or(0))
+        .sum();
 
-        entries.push(LeaderboardEntry {
-            user_id: p.user_id,
-            user_name: p.user_name,
-            total_points,
-        });
+    let captain_minutes = played_minutes(pool, entry.captain_id, gameweek).await?;
+    let vice_minutes = played_minutes(pool, entry.vice_captain_id, gameweek).await?;
+
+    if captain_minutes > 0 {
+        total += points_by.get(&entry.captain_id).copied().unwrap_or(0);
+    } else if vice_minutes > 0 {
+        total += points_by.get(&entry.vice_captain_id).copied().unwrap_or(0);
+    }
+
+    Ok(total)
+}
+
+/// Points for a one-shot Derby entry — scored from that single fixture only.
+pub async fn get_derby_entry_points(pool: &PgPool, entry: &ContestEntry, fixture_id: i32) -> Result<i32> {
+    let rows = sqlx::query!(
+        r#"
+        SELECT player_id, points, minutes
+        FROM player_match_stats
+        WHERE fixture_id = $1 AND player_id = ANY($2)
+        "#,
+        fixture_id,
+        &entry.players,
+    )
+    .fetch_all(pool)
+    .await?;
+
+    let mut points_by: HashMap<i32, i32> = HashMap::new();
+    let mut minutes_by: HashMap<i32, i32> = HashMap::new();
+    for r in rows {
+        points_by.insert(r.player_id, r.points);
+        minutes_by.insert(r.player_id, r.minutes.unwrap_or(0));
+    }
+
+    let mut total: i32 = entry
+        .players
+        .iter()
+        .map(|id| points_by.get(id).copied().unwrap_or(0))
+        .sum();
+
+    let captain_minutes = minutes_by.get(&entry.captain_id).copied().unwrap_or(0);
+    let vice_minutes = minutes_by.get(&entry.vice_captain_id).copied().unwrap_or(0);
+
+    if captain_minutes > 0 {
+        total += points_by.get(&entry.captain_id).copied().unwrap_or(0);
+    } else if vice_minutes > 0 {
+        total += points_by.get(&entry.vice_captain_id).copied().unwrap_or(0);
+    }
+
+    Ok(total)
+}
+
+pub async fn get_league_leaderboard(pool: &PgPool, league_id: i32) -> Result<Vec<LeaderboardEntry>> {
+    let league = fantasy_league_model::get_league(pool, league_id).await?;
+
+    let mut entries = Vec::new();
+
+    match league.contest_type.as_str() {
+        "campaign" => {
+            let gameweek = crate::helpers::fpl_meta::current_gameweek().await?;
+
+            let participants = sqlx::query!(
+                "SELECT user_id, user_name FROM fantasy_league_participants WHERE league_id = $1",
+                league_id
+            )
+            .fetch_all(pool)
+            .await?;
+
+            for p in participants {
+                let total_points = get_team_points(pool, p.user_id, gameweek)
+                    .await
+                    .map(|tp| tp.total_points)
+                    .unwrap_or(0); // no squad created yet
+
+                entries.push(LeaderboardEntry {
+                    user_id: p.user_id,
+                    user_name: p.user_name,
+                    total_points,
+                });
+            }
+        }
+
+        "round" | "derby" => {
+            let participants = sqlx::query!(
+                r#"
+                SELECT user_id, user_name, team_data AS "team_data!: Json<ContestEntry>"
+                FROM fantasy_league_participants
+                WHERE league_id = $1
+                "#,
+                league_id
+            )
+            .fetch_all(pool)
+            .await?;
+
+            for p in participants {
+                let total_points = if league.contest_type == "round" {
+                    get_round_entry_points(pool, &p.team_data.0, league.gameweek.unwrap_or(0)).await?
+                } else {
+                    get_derby_entry_points(pool, &p.team_data.0, league.fixture_id.unwrap_or(0)).await?
+                };
+
+                entries.push(LeaderboardEntry {
+                    user_id: p.user_id,
+                    user_name: p.user_name,
+                    total_points,
+                });
+            }
+        }
+
+        _ => {}
     }
 
     entries.sort_by(|a, b| b.total_points.cmp(&a.total_points));

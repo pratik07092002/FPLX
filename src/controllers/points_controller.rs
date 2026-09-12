@@ -26,12 +26,7 @@ pub async fn league_leaderboard(
 ) -> HttpResponse {
     let league_id = path.into_inner();
 
-    let gameweek = match fpl_meta::current_gameweek().await {
-        Ok(gw) => gw,
-        Err(e) => return HttpResponse::BadRequest().json(response_helper::failure(&e.to_string(), 400)),
-    };
-
-    match points_engine_model::get_league_leaderboard(pool.get_ref(), league_id, gameweek).await {
+    match points_engine_model::get_league_leaderboard(pool.get_ref(), league_id).await {
         Ok(entries) => HttpResponse::Ok().json(response_helper::success("Leaderboard fetched", entries)),
         Err(e) => {
             eprintln!("Get leaderboard error: {:?}", e);

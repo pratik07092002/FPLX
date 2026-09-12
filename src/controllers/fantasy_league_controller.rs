@@ -1,7 +1,7 @@
 use actix_web::{HttpResponse, web};
 
 use crate::datamodels::auth_models::AuthUser;
-use crate::datamodels::fantasy_league_data_model::{self, CreateLeagueRequest, FantasyLeague};
+use crate::datamodels::fantasy_league_data_model::{CreateLeagueRequest, JoinLeagueRequest};
 use crate::helpers::fantasy_league_helper::generate_code;
 use crate::helpers::response_helper;
 use crate::models::fantasy_league_model;
@@ -37,7 +37,7 @@ pub async fn create_league(
                     _ => "Database error",
                 }
             } else {
-                "Failed to create league"
+                &err_str
             };
 
             let res = response_helper::failure(msg, 400);
@@ -58,6 +58,26 @@ async fn handle_create(
         anyhow::bail!("Invalid league type");
     }
 
+    let (fixture_id, gameweek) = match body.contest_type.as_str() {
+        "campaign" => (None, None),
+
+        "derby" => {
+            let fixture_id = body
+                .fixture_id
+                .ok_or_else(|| anyhow::anyhow!("A derby league needs a fixture_id"))?;
+            (Some(fixture_id), None)
+        }
+
+        "round" => {
+            let gameweek = body
+                .gameweek
+                .ok_or_else(|| anyhow::anyhow!("A round league needs a gameweek"))?;
+            (None, Some(gameweek))
+        }
+
+        other => anyhow::bail!("Unknown contest type: {}", other),
+    };
+
     // Generate join code if private
     let join_code = if body.league_type == "private" {
         Some(generate_code())
@@ -73,23 +93,57 @@ async fn handle_create(
         &mut tx,
         &body.league_name,
         &body.league_type,
+        &body.contest_type,
+        fixture_id,
+        gameweek,
         user.user_id,
         &user.wallet,
         join_code,
     )
     .await?;
 
-    // Auto join creator
-    fantasy_league_model::add_participant_tx(
-        &mut tx,
-        league.id,
-        user.user_id,
-        &user.wallet,
-    )
-    .await?;
+    // Campaign leagues auto-join the creator on their existing squad.
+    // Derby/Round need a squad submitted, so the creator joins separately
+    // via /fantasy/leagues/{id}/join like everyone else.
+    if body.contest_type == "campaign" {
+        fantasy_league_model::add_participant_tx(
+            &mut tx,
+            league.id,
+            user.user_id,
+            &user.wallet,
+        )
+        .await?;
+    }
 
     // Commit
     tx.commit().await?;
 
     Ok(league)
+}
+
+pub async fn join_league(
+    user: AuthUser,
+    pool: web::Data<PgPool>,
+    path: web::Path<i32>,
+    body: web::Json<JoinLeagueRequest>,
+) -> HttpResponse {
+    let league_id = path.into_inner();
+    let body = body.into_inner();
+
+    match fantasy_league_model::join_league(
+        pool.get_ref(),
+        league_id,
+        user.user_id,
+        &user.wallet,
+        body.join_code.as_deref(),
+        body.entry,
+    )
+    .await
+    {
+        Ok(_) => HttpResponse::Ok().json(response_helper::success("Joined league", ())),
+        Err(e) => {
+            eprintln!("Join league error: {:?}", e);
+            HttpResponse::BadRequest().json(response_helper::failure(&e.to_string(), 400))
+        }
+    }
 }

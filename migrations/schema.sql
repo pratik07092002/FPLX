@@ -245,6 +245,20 @@ CREATE TABLE IF NOT EXISTS fantasy_leagues (
     league_type TEXT NOT NULL
         CHECK (league_type IN ('public','private')),
 
+    -- campaign = season-long (fantasy_teams), derby = single fixture,
+    -- round = single gameweek (derby/round entries live on the participant row)
+    contest_type TEXT NOT NULL DEFAULT 'campaign'
+        CHECK (contest_type IN ('campaign','derby','round')),
+
+    fixture_id INTEGER REFERENCES fixtures(id),
+    gameweek INTEGER,
+
+    CHECK (
+        (contest_type = 'campaign' AND fixture_id IS NULL AND gameweek IS NULL)
+        OR (contest_type = 'derby' AND fixture_id IS NOT NULL AND gameweek IS NULL)
+        OR (contest_type = 'round' AND gameweek IS NOT NULL AND fixture_id IS NULL)
+    ),
+
     -- free or paid league
     mode TEXT DEFAULT 'free'
         CHECK (mode IN ('free','paid')),

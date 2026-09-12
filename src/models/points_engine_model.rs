@@ -125,7 +125,7 @@ pub async fn get_team_points(pool: &PgPool, user_id: Uuid, gameweek: i32) -> Res
 
     let players = sqlx::query!(
         r#"
-        SELECT p.id, p.first_name, p.second_name, p.position, p.points
+        SELECT p.id, p.first_name, p.second_name, p.position, p.points, fp.is_starting
         FROM fantasy_team_players fp
         JOIN players p ON p.id = fp.player_id
         WHERE fp.fantasy_team_id = $1
@@ -143,7 +143,12 @@ pub async fn get_team_points(pool: &PgPool, user_id: Uuid, gameweek: i32) -> Res
 
     for p in players {
         let points = p.points.unwrap_or(0);
-        total += points;
+
+        // Only the starting XI counts toward the team total — the bench is
+        // informational only until auto-substitutions are implemented.
+        if p.is_starting {
+            total += points;
+        }
 
         out.push(PlayerPoints {
             player_id: p.id,
@@ -153,9 +158,11 @@ pub async fn get_team_points(pool: &PgPool, user_id: Uuid, gameweek: i32) -> Res
             points,
             is_captain: p.id == team.captain_id,
             is_vice_captain: p.id == team.vice_captain_id,
+            is_starting: p.is_starting,
         });
     }
 
+    // Captain/vice-captain are guaranteed to be starters by squad validation.
     if captain_minutes > 0 {
         total += out.iter().find(|p| p.is_captain).map(|p| p.points).unwrap_or(0);
     } else if vice_minutes > 0 {

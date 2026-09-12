@@ -62,14 +62,15 @@ pub async fn upsert_players(
                 saves,
                 starts,
 
-                news, 
-                position
+                news,
+                position,
+                now_cost
             )
             VALUES (
                 $1,$2,$3,$4,$5,
                 $6,$7,$8,$9,
                 $10,$11,$12,$13,$14,$15,
-                $16,$17
+                $16,$17,$18
             )
 
             ON CONFLICT (id)
@@ -93,7 +94,8 @@ pub async fn upsert_players(
                 starts = EXCLUDED.starts,
 
                 news = EXCLUDED.news,
-                position = EXCLUDED.position
+                position = EXCLUDED.position,
+                now_cost = EXCLUDED.now_cost
             "#,
 
             // Primary
@@ -117,7 +119,8 @@ pub async fn upsert_players(
             player.starts,
 
             player.news,
-            player.position
+            player.position,
+            player.now_cost.unwrap_or(0),
         )
         .execute(pool)
         .await?;

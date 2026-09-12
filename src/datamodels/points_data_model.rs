@@ -10,6 +10,7 @@ pub struct PlayerPoints {
     pub points: i32,
     pub is_captain: bool,
     pub is_vice_captain: bool,
+    pub is_starting: bool,
 }
 
 #[derive(Debug, Serialize)]

@@ -73,6 +73,9 @@ pub struct FPLPlayer {
 
     #[serde(rename = "element_type")]
     pub position: Option<i32>,
+
+    #[serde(default)]
+    pub now_cost: Option<i32>,
 }
 
 #[derive(Debug, Deserialize)]

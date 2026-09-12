@@ -17,6 +17,7 @@ pub mod helpers{
     pub mod fantasy_league_helper;
     pub mod fpl_meta;
     pub mod scoring_rules;
+    pub mod squad_rules;
 }
 pub mod models {
     pub mod official_fpl_sync_model;

@@ -1,11 +1,12 @@
 use actix_web::{HttpResponse, web};
 use anyhow::Result;
 use sqlx::PgPool;
+use std::collections::HashSet;
 use uuid::Uuid;
 
 use crate::{
     datamodels::{auth_models::AuthUser, fantasy_team_data_models::CreateTeamRequest},
-    helpers::response_helper,
+    helpers::{response_helper, squad_rules},
     models::fantasy_team_model,
 };
 
@@ -56,21 +57,20 @@ async fn process(
 
     // ---------- VALIDATION ----------
 
-    if req.players.len() != 15 {
-        anyhow::bail!("Exactly 15 players required");
+    let squad_info = fantasy_team_model::get_squad_player_info(pool, &req.players).await?;
+
+    if squad_info.len() != req.players.len() {
+        anyhow::bail!("One or more selected players do not exist");
     }
 
-    if req.captain_id == req.vice_captain_id {
-        anyhow::bail!("Captain and VC same");
-    }
+    let starting_ids: HashSet<i32> = req.starting_ids.iter().copied().collect();
 
-    if !req.players.contains(&req.captain_id) {
-        anyhow::bail!("Captain not in team");
-    }
-
-    if !req.players.contains(&req.vice_captain_id) {
-        anyhow::bail!("VC not in team");
-    }
+    squad_rules::validate_squad(
+        &squad_info,
+        &starting_ids,
+        req.captain_id,
+        req.vice_captain_id,
+    )?;
 
     // ---------- TRANSACTION ----------
 
@@ -91,6 +91,7 @@ async fn process(
         &mut tx,
         team_id,
         &req.players,
+        &starting_ids,
     )
     .await?;
 
